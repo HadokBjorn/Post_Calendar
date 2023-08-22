@@ -9,3 +9,31 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Media{
+  id Int @default(autoincrement()) @id
+  title String
+  username String
+  publications Publication[]
+
+  @@map("medias")
+}
+
+model Post{
+  id Int @default(autoincrement()) @id
+  title String
+  text String
+  publications Publication[]
+  @@map("posts")
+}
+
+model Publication{
+  id Int @default(autoincrement()) @id
+  mediaId Int
+  media Media @relation(fields: [mediaId], references: [id])
+  postId Int
+  post Post @relation(fields: [postId],references: [id])
+  date DateTime
+
+  @@map("publications")
+}
