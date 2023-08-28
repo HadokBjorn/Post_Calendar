@@ -1,15 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
+import { MediasRepository } from './medias.repository';
 
 @Injectable()
 export class MediasService {
-  create(createMediaDto: CreateMediaDto) {
-    return 'This action adds a new media';
+  constructor(private readonly mediasRepository: MediasRepository) {}
+
+  createMedia(media: CreateMediaDto) {
+    const alreadyExistMedia =
+      this.mediasRepository.getMediasByTitleAndUsername(media);
+    if (alreadyExistMedia) throw new ConflictException('Media already exist');
+
+    return this.mediasRepository.createMedia(media);
   }
 
   findAll() {
-    return `This action returns all medias`;
+    return this.mediasRepository.getMedias();
   }
 
   findOne(id: number) {

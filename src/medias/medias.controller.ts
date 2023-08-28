@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { MediasService } from './medias.service';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
@@ -8,8 +16,8 @@ export class MediasController {
   constructor(private readonly mediasService: MediasService) {}
 
   @Post()
-  create(@Body() createMediaDto: CreateMediaDto) {
-    return this.mediasService.create(createMediaDto);
+  create(@Body() media: CreateMediaDto) {
+    return this.mediasService.createMedia(media);
   }
 
   @Get()
