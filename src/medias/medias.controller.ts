@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { MediasService } from './medias.service';
 import { CreateMediaDto } from './dto/create-media.dto';
@@ -26,8 +27,8 @@ export class MediasController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.mediasService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.mediasService.findOne(id);
   }
 
   @Patch(':id')

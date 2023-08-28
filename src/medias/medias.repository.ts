@@ -17,13 +17,19 @@ export class MediasRepository {
   }
 
   async getMedias() {
-    return this.prisma.media.findMany();
+    return await this.prisma.media.findMany();
   }
 
   async getMediasByTitleAndUsername(media: CreateMediaDto) {
     const { title, username } = media;
-    return this.prisma.media.findFirst({
+    return await this.prisma.media.findFirst({
       where: { title, username },
+    });
+  }
+
+  async getMediaById(id: number) {
+    return await this.prisma.media.findUnique({
+      where: { id: id },
     });
   }
 }
