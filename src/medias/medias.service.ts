@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -13,7 +14,9 @@ export class MediasService {
 
   async createMedia(media: CreateMediaDto) {
     const alreadyExistMedia =
-      this.mediasRepository.getMediasByTitleAndUsername(media);
+      await this.mediasRepository.getMediasByTitleAndUsername(media);
+    console.log(alreadyExistMedia);
+
     if (alreadyExistMedia) throw new ConflictException('Media already exist');
 
     return await this.mediasRepository.createMedia(media);
@@ -29,8 +32,41 @@ export class MediasService {
     return media;
   }
 
-  async update(id: number, updateMediaDto: UpdateMediaDto) {
-    return `This action updates a #${id} media`;
+  async update(id: number, updateMedia: UpdateMediaDto) {
+    const { title, username } = updateMedia;
+    let mediaWithSameBody: any;
+
+    if (!title && !username) {
+      throw new BadRequestException('Update body is required');
+    }
+    const mediaToUpdate = await this.mediasRepository.getMediaById(id);
+    if (!mediaToUpdate) {
+      throw new NotFoundException(`Media with id ${id} not exist`);
+    }
+    if (!title) {
+      mediaWithSameBody =
+        await this.mediasRepository.getMediasByTitleAndUsername({
+          title: mediaToUpdate.title,
+          username,
+        });
+    }
+    if (!username) {
+      mediaWithSameBody =
+        await this.mediasRepository.getMediasByTitleAndUsername({
+          title,
+          username: mediaToUpdate.username,
+        });
+    }
+    mediaWithSameBody =
+      await this.mediasRepository.getMediasByTitleAndUsername(updateMedia);
+
+    if (mediaWithSameBody) {
+      throw new ConflictException(
+        `Media with 'title: ${mediaWithSameBody.title}' and 'username: ${mediaWithSameBody.username}' already exist`,
+      );
+    }
+
+    return await this.mediasRepository.updateMedia(id, updateMedia);
   }
 
   async remove(id: number) {
