@@ -52,14 +52,14 @@ export class PostFactory {
     });
   }
 
-  async createRandomMediaWithImage() {
+  async createRandomPostWithImage() {
     const post = this.setRandomBuildWithImage();
     return await this.prisma.post.create({
       data: post,
     });
   }
 
-  async createRandomMediaWithoutImage() {
+  async createRandomPostWithoutImage() {
     const post = this.setRandomBuildWithoutImage();
     return await this.prisma.post.create({
       data: post,

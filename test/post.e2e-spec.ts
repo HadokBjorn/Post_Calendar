@@ -85,9 +85,9 @@ describe('MediaController (e2e)', () => {
   });
 
   it('/posts (GET) should get all posts', async () => {
-    await new PostFactory(prisma).createRandomMediaWithImage();
-    await new PostFactory(prisma).createRandomMediaWithImage();
-    await new PostFactory(prisma).createRandomMediaWithImage();
+    await new PostFactory(prisma).createRandomPostWithImage();
+    await new PostFactory(prisma).createRandomPostWithImage();
+    await new PostFactory(prisma).createRandomPostWithImage();
 
     const { body, status } = await request(app.getHttpServer()).get('/posts');
     expect(status).toBe(HttpStatus.OK);
@@ -95,7 +95,7 @@ describe('MediaController (e2e)', () => {
   });
 
   it('/posts/:id (GET) should get a post by id', async () => {
-    const post = await new PostFactory(prisma).createRandomMediaWithImage();
+    const post = await new PostFactory(prisma).createRandomPostWithImage();
 
     const { body, status } = await request(app.getHttpServer()).get(
       `/posts/${post.id}`,
@@ -105,7 +105,7 @@ describe('MediaController (e2e)', () => {
   });
 
   it('/posts/:id (GET) should return Not Found Error when id not exist', async () => {
-    const { id } = await new PostFactory(prisma).createRandomMediaWithImage();
+    const { id } = await new PostFactory(prisma).createRandomPostWithImage();
 
     const { status } = await request(app.getHttpServer()).get(
       `/posts/${id + 1}`,
@@ -114,7 +114,7 @@ describe('MediaController (e2e)', () => {
   });
 
   it('/posts/:id (PUT) should return status 200 and update a media by id', async () => {
-    const { id } = await new PostFactory(prisma).createRandomMediaWithImage();
+    const { id } = await new PostFactory(prisma).createRandomPostWithImage();
     const updatePost = new PostFactory(prisma).setRandomBuildWithImage();
 
     const { status, body } = await request(app.getHttpServer())
@@ -131,7 +131,7 @@ describe('MediaController (e2e)', () => {
   });
 
   it('/posts/:id (PUT) should return Not Found Error 404 when post not exist', async () => {
-    const { id } = await new PostFactory(prisma).createRandomMediaWithImage();
+    const { id } = await new PostFactory(prisma).createRandomPostWithImage();
 
     const { status } = await request(app.getHttpServer())
       .put(`/posts/${id + 1}`)
@@ -143,7 +143,7 @@ describe('MediaController (e2e)', () => {
   it('/posts/:id (DELETE) should return Forbidden Error 403 when post is schedule or published', async () => {
     //setup
     const media = await new MediaFactory(prisma).createRandomMedia();
-    const post = await new PostFactory(prisma).createRandomMediaWithImage();
+    const post = await new PostFactory(prisma).createRandomPostWithImage();
     await prisma.publication.create({
       data: {
         mediaId: media.id,
@@ -160,7 +160,7 @@ describe('MediaController (e2e)', () => {
   });
 
   it('/posts/:id (DELETE) should return Not Found Error 404 when post not exist', async () => {
-    const { id } = await new PostFactory(prisma).createRandomMediaWithImage();
+    const { id } = await new PostFactory(prisma).createRandomPostWithImage();
 
     await request(app.getHttpServer())
       .delete(`/posts/${id + 1}`)
@@ -168,7 +168,7 @@ describe('MediaController (e2e)', () => {
   });
 
   it('/posts/:id (DELETE) should return status 200 and delete post by id', async () => {
-    const { id } = await new PostFactory(prisma).createRandomMediaWithImage();
+    const { id } = await new PostFactory(prisma).createRandomPostWithImage();
 
     await request(app.getHttpServer())
       .delete(`/posts/${id}`)
