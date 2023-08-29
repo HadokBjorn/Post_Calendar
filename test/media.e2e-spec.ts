@@ -119,7 +119,7 @@ describe('MediaController (e2e)', () => {
     expect(status).toBe(HttpStatus.NOT_FOUND);
   });
 
-  it('/medias/:id (PUT) should update a media by id', async () => {
+  it('/medias/:id (PUT) should return status 200 and update a media by id', async () => {
     const { id } = await new MediaFactory(prisma).createRandomMedia();
     const updateMedia = new MediaFactory(prisma).setRandomBuild();
 
@@ -133,5 +133,55 @@ describe('MediaController (e2e)', () => {
       title: updateMedia.title,
       username: updateMedia.username,
     });
+  });
+
+  it('/medias/:id (PUT) should return Conflict Error 409 when media update is the same as existing media', async () => {
+    const { id, title, username } = await new MediaFactory(
+      prisma,
+    ).createRandomMedia();
+
+    const { status } = await request(app.getHttpServer())
+      .put(`/medias/${id}`)
+      .send({ title, username });
+
+    expect(status).toBe(HttpStatus.CONFLICT);
+  });
+
+  it('/medias/:id (PUT) should return Not Found Error 404 when media not exist', async () => {
+    const { id } = await new MediaFactory(prisma).createRandomMedia();
+
+    const { status } = await request(app.getHttpServer())
+      .put(`/medias/${id + 1}`)
+      .send({ title: 'test@test_123' });
+
+    expect(status).toBe(HttpStatus.NOT_FOUND);
+  });
+
+  //TODO: Fazer a implementação desse test quando existir a post factory
+
+  /* it('/medias/:id (DELETE) should return Forbidden Error 403 when media is schedule or published', async () => {
+    const { id } = await new MediaFactory(prisma).createRandomMedia();
+
+    const { status } = await request(app.getHttpServer())
+      .delete(`/medias/${ id }`)
+      .send({ title: 'test@test_123' });
+
+    expect(status).toBe(HttpStatus.NOT_FOUND);
+  }); */
+
+  it('/medias/:id (DELETE) should return Not Found Error 404 when media not exist', async () => {
+    const { id } = await new MediaFactory(prisma).createRandomMedia();
+
+    await request(app.getHttpServer())
+      .delete(`/medias/${id + 1}`)
+      .expect(HttpStatus.NOT_FOUND);
+  });
+
+  it('/medias/:id (DELETE) should return status 200 and delete media by id', async () => {
+    const { id } = await new MediaFactory(prisma).createRandomMedia();
+
+    await request(app.getHttpServer())
+      .delete(`/medias/${id}`)
+      .expect(HttpStatus.OK);
   });
 });
