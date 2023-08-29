@@ -26,6 +26,9 @@ CREATE TABLE "publications" (
     CONSTRAINT "publications_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateIndex
+CREATE UNIQUE INDEX "medias_title_username_key" ON "medias"("title", "username");
+
 -- AddForeignKey
 ALTER TABLE "publications" ADD CONSTRAINT "publications_mediaId_fkey" FOREIGN KEY ("mediaId") REFERENCES "medias"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -61,15 +62,20 @@ export class MediasService {
       await this.mediasRepository.getMediasByTitleAndUsername(updateMedia);
 
     if (mediaWithSameBody) {
-      throw new ConflictException(
-        `Media with 'title: ${mediaWithSameBody.title}' and 'username: ${mediaWithSameBody.username}' already exist`,
-      );
+      throw new ConflictException(`Media with your updates already exist`);
     }
 
     return await this.mediasRepository.updateMedia(id, updateMedia);
   }
 
   async remove(id: number) {
-    return `This action removes a #${id} media`;
+    const media = await this.mediasRepository.getMediaWithPublications(id);
+    if (!media) throw new NotFoundException(`Media with id #${id} not exist`);
+    if (media.publications.length > 0) {
+      throw new ForbiddenException(
+        'the media is scheduled to be published or has already been posted.',
+      );
+    }
+    return await this.mediasRepository.deleteMedia(id);
   }
 }

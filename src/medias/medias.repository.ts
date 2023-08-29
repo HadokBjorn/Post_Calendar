@@ -18,8 +18,10 @@ export class MediasRepository {
   }
 
   async getMediasByTitleAndUsername(media: CreateMediaDto) {
-    return await this.prisma.media.findFirst({
-      where: media,
+    return await this.prisma.media.findUnique({
+      where: {
+        title_username: media,
+      },
     });
   }
 
@@ -29,9 +31,22 @@ export class MediasRepository {
     });
   }
 
+  async getMediaWithPublications(id: number) {
+    return await this.prisma.media.findUnique({
+      where: { id },
+      include: { publications: true },
+    });
+  }
+
   async updateMedia(id: number, updateMedia: UpdateMediaDto) {
     return await this.prisma.media.update({
       data: updateMedia,
+      where: { id },
+    });
+  }
+
+  async deleteMedia(id: number) {
+    return await this.prisma.media.delete({
       where: { id },
     });
   }
