@@ -7,7 +7,7 @@ import { PrismaService } from '../src/prisma/prisma.service';
 import { PostFactory } from './factories/post.factory';
 import { MediaFactory } from './factories/media.factory';
 
-describe('MediaController (e2e)', () => {
+describe('PostsController (e2e)', () => {
   let app: INestApplication;
   const prisma: PrismaService = new PrismaService();
 
