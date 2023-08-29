@@ -113,7 +113,7 @@ describe('MediaController (e2e)', () => {
     expect(status).toBe(HttpStatus.NOT_FOUND);
   });
 
-  it('/posts/:id (PUT) should return status 200 and update a media by id', async () => {
+  it('/posts/:id (PUT) should return status 200 and update a post by id', async () => {
     const { id } = await new PostFactory(prisma).createRandomPostWithImage();
     const updatePost = new PostFactory(prisma).setRandomBuildWithImage();
 
