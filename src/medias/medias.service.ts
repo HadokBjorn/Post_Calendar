@@ -16,7 +16,6 @@ export class MediasService {
   async createMedia(media: CreateMediaDto) {
     const alreadyExistMedia =
       await this.mediasRepository.getMediasByTitleAndUsername(media);
-    console.log(alreadyExistMedia);
 
     if (alreadyExistMedia) throw new ConflictException('Media already exist');
 
