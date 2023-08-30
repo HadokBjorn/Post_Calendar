@@ -152,11 +152,9 @@ describe('PostsController (e2e)', () => {
       },
     });
     //test
-    const { status } = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .delete(`/posts/${post.id}`)
-      .send({ title: 'This is my title' });
-
-    expect(status).toBe(HttpStatus.FORBIDDEN);
+      .expect(HttpStatus.FORBIDDEN);
   });
 
   it('/posts/:id (DELETE) should return Not Found Error 404 when post not exist', async () => {
