@@ -99,7 +99,7 @@ describe('PublicationsController (e2e)', () => {
     expect(body).toHaveLength(0);
   });
 
-  it('/publications (GET) should get all publications', async () => {
+  it('/publications (GET) should return all publications', async () => {
     await new PublicationFactory(prisma).createRandomPublication();
     await new PublicationFactory(prisma).createRandomPublication();
     await new PublicationFactory(prisma).createRandomPublication();
@@ -109,6 +109,60 @@ describe('PublicationsController (e2e)', () => {
     );
     expect(status).toBe(HttpStatus.OK);
     expect(body).toHaveLength(3);
+  });
+
+  it('/publications?published=true (GET) should return all posted publications', async () => {
+    await new PublicationFactory(prisma).createRandomPastPublication();
+    await new PublicationFactory(prisma).createRandomPastPublication();
+    await new PublicationFactory(prisma).createRandomPastPublication();
+
+    const { body, status } = await request(app.getHttpServer()).get(
+      '/publications?published=true',
+    );
+    expect(status).toBe(HttpStatus.OK);
+    expect(body).toHaveLength(3);
+  });
+
+  it('/publications?published=false (GET) should return all not posted publications', async () => {
+    await new PublicationFactory(prisma).createRandomPublication();
+    await new PublicationFactory(prisma).createRandomPublication();
+    await new PublicationFactory(prisma).createRandomPublication();
+
+    const { body, status } = await request(app.getHttpServer()).get(
+      '/publications?published=false',
+    );
+    expect(status).toBe(HttpStatus.OK);
+    expect(body).toHaveLength(3);
+  });
+  it('/publications?after=[today] (GET) should return all not posted publications', async () => {
+    await new PublicationFactory(prisma).createRandomPublication();
+    await new PublicationFactory(prisma).createRandomPublication();
+    await new PublicationFactory(prisma).createRandomPublication();
+    const today = new Date().toISOString();
+    const { body, status } = await request(app.getHttpServer()).get(
+      `/publications?after=${today}`,
+    );
+    expect(status).toBe(HttpStatus.OK);
+    expect(body).toHaveLength(3);
+  });
+
+  it('/publications?published=true&after=[futureDay] (GET) should return an empty list of publications', async () => {
+    //setup
+    await new PublicationFactory(prisma).createRandomPublication();
+    await new PublicationFactory(prisma).createRandomPublication();
+    await new PublicationFactory(prisma).createRandomPublication();
+    const today = new Date();
+    const oneDayMilliseconds = 24 * 60 * 60 * 1000;
+    const futureDay = new Date(
+      today.getTime() + oneDayMilliseconds,
+    ).toISOString();
+    //test
+    const { body, status } = await request(app.getHttpServer()).get(
+      `/publications?published=true&after=${futureDay}`,
+    );
+
+    expect(status).toBe(HttpStatus.OK);
+    expect(body).toHaveLength(0);
   });
 
   it('/publications/:id (GET) should get a publication by id', async () => {

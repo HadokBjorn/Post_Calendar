@@ -23,6 +23,38 @@ export class PublicationsRepository {
     });
   }
 
+  async getPublicationsPublishedAndAfter(after: Date) {
+    return this.prisma.publication.findMany({
+      where: {
+        AND: [{ date: { gt: after } }, { date: { lt: new Date() } }],
+      },
+    });
+  }
+
+  async getPublicationsAfter(after: Date) {
+    return this.prisma.publication.findMany({
+      where: {
+        date: { gt: after },
+      },
+    });
+  }
+
+  async getPublicationsPublished(date: Date) {
+    return this.prisma.publication.findMany({
+      where: {
+        date: { lt: date },
+      },
+    });
+  }
+
+  async getPublicationsNotPublished(date: Date) {
+    return this.prisma.publication.findMany({
+      where: {
+        date: { gt: date },
+      },
+    });
+  }
+
   async updatePublication(id: number, updatePublication: UpdatePublicationDto) {
     return await this.prisma.publication.update({
       data: updatePublication,

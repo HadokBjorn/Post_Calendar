@@ -6,10 +6,13 @@ import {
   Param,
   Delete,
   Put,
+  Query,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import { PublicationsService } from './publications.service';
 import { CreatePublicationDto } from './dto/create-publication.dto';
 import { UpdatePublicationDto } from './dto/update-publication.dto';
+import { ParseDatePipe } from './pipes/date.pipe';
 
 @Controller('publications')
 export class PublicationsController {
@@ -21,8 +24,12 @@ export class PublicationsController {
   }
 
   @Get()
-  findAll() {
-    return this.publicationsService.findAll();
+  findAll(
+    @Query('published', new ParseBoolPipe({ optional: true }))
+    published: boolean,
+    @Query('after', ParseDatePipe) after: Date,
+  ) {
+    return this.publicationsService.findAll(published, after);
   }
 
   @Get(':id')

@@ -24,12 +24,35 @@ export class PublicationsService {
     );
   }
 
-  async findAll() {
+  async findAll(published?: boolean, after?: Date) {
+    const today = new Date();
+    if (published && after) {
+      //because not exist posting in future
+      if (after > today) return [];
+
+      return await this.publicationRepository.getPublicationsPublishedAndAfter(
+        after,
+      );
+    }
+    if (published && !after) {
+      return await this.publicationRepository.getPublicationsPublished(today);
+    }
+    if (published === undefined && after) {
+      return await this.publicationRepository.getPublicationsAfter(after);
+    }
+    if (published === false && after) {
+      const date = after > today ? after : today;
+      return await this.publicationRepository.getPublicationsNotPublished(date);
+    }
+
+    if (published === false && !after) {
+      return await this.publicationRepository.getPublicationsNotPublished(
+        today,
+      );
+    }
+
     return await this.publicationRepository.getPublications();
   }
-
-  //TODO: Implementar filtros de query string
-  // fazer aqui
 
   async findOne(id: number) {
     const publication = await this.publicationRepository.getPublicationById(id);
@@ -49,7 +72,9 @@ export class PublicationsService {
       throw new NotFoundException(`Publication with id #${id} not exist`);
     }
     await this.validationPublication(updatePublicationDto);
-    this.pastDateVerification(new Date(date));
+    if (this.pastDateVerification(new Date(date))) {
+      throw new ForbiddenException('You cannot update publication in the past');
+    }
     return await this.publicationRepository.updatePublication(
       id,
       updatePublicationDto,
@@ -74,8 +99,6 @@ export class PublicationsService {
 
   private pastDateVerification(date: Date) {
     const today = new Date();
-    if (date < today) {
-      throw new ForbiddenException('You cannot update publication in the past');
-    }
+    return date < today;
   }
 }

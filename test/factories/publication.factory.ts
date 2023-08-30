@@ -42,6 +42,16 @@ export class PublicationFactory {
     };
   }
 
+  async setPastRandomBuild() {
+    const media = await new MediaFactory(this.prisma).createRandomMedia();
+    const post = await new PostFactory(this.prisma).createRandomPostWithImage();
+    return {
+      mediaId: media.id,
+      postId: post.id,
+      date: faker.date.past({ refDate: new Date() }).toISOString(),
+    };
+  }
+
   async createPublication() {
     const publication = this.setBuild();
     return await this.prisma.publication.create({
@@ -51,6 +61,13 @@ export class PublicationFactory {
 
   async createRandomPublication() {
     const publication = await this.setRandomBuild();
+    return await this.prisma.publication.create({
+      data: publication,
+    });
+  }
+
+  async createRandomPastPublication() {
+    const publication = await this.setPastRandomBuild();
     return await this.prisma.publication.create({
       data: publication,
     });
