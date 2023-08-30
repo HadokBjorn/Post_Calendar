@@ -5,6 +5,7 @@ import { AppModule } from '../src/app.module';
 import { PrismaUtils } from './utils/prisma.utils';
 import { MediaFactory } from './factories/media.factory';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { PostFactory } from './factories/post.factory';
 
 describe('MediaController (e2e)', () => {
   let app: INestApplication;
@@ -159,15 +160,22 @@ describe('MediaController (e2e)', () => {
 
   //TODO: Fazer a implementação desse test quando existir a post factory
 
-  /* it('/medias/:id (DELETE) should return Forbidden Error 403 when media is schedule or published', async () => {
-    const { id } = await new MediaFactory(prisma).createRandomMedia();
-
-    const { status } = await request(app.getHttpServer())
-      .delete(`/medias/${ id }`)
-      .send({ title: 'test@test_123' });
-
-    expect(status).toBe(HttpStatus.NOT_FOUND);
-  }); */
+  it('/posts/:id (DELETE) should return Forbidden Error 403 when media is schedule or published', async () => {
+    //setup
+    const media = await new MediaFactory(prisma).createRandomMedia();
+    const post = await new PostFactory(prisma).createRandomPostWithImage();
+    await prisma.publication.create({
+      data: {
+        mediaId: media.id,
+        postId: post.id,
+        date: new Date(),
+      },
+    });
+    //test
+    await request(app.getHttpServer())
+      .delete(`/medias/${media.id}`)
+      .expect(HttpStatus.FORBIDDEN);
+  });
 
   it('/medias/:id (DELETE) should return Not Found Error 404 when media not exist', async () => {
     const { id } = await new MediaFactory(prisma).createRandomMedia();
